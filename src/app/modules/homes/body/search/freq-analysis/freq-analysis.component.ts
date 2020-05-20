@@ -12,7 +12,7 @@ import { IpService } from 'src/app/ip.service'
 })
 export class FreqAnalysisComponent implements OnInit {
   private searchKeyword;
-  private URL = this.ipService.getCommonIp() + ":5000/keywordGraph"
+  private URL = this.ipService.getUserServerIp() + ":5000/keywordGraph"
 
   private headers: HttpHeaders = new HttpHeaders({
     "Content-Type": "application/json"

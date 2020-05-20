@@ -4,8 +4,8 @@
     </form>
     <div class="uk-flex-inline">
         <button class="uk-button uk-button-text">
-      연관검색어&nbsp;&nbsp;<span uk-icon="icon: info; ratio:0.8"></span>
-    </button>
+            연관검색어&nbsp;&nbsp;<span uk-icon="icon: info; ratio:0.8"></span>
+        </button>
         <div uk-spinner="ratio: 2.5 " *ngIf="isKeyLoaded == false; else infoLoadFin">
             Loading...
         </div>
@@ -29,8 +29,13 @@
         <div class="uk-width-small">
             <div class="row">
                 <button (click)="freqAnalysis()" class="uk-button uk-button-primary">
-          키워드 분석
-        </button>
+                    키워드 분석
+                </button>
+            </div>
+            <div class="row">
+                <button (click)="keepMyDoc()" class="uk-button uk-button-primary">
+                    KEEP
+                </button>
             </div>
             <div class="row">
                 <div class="search-filter" style="width : 50px;">
@@ -38,80 +43,84 @@
                 </div>
             </div>
         </div>
+        <div class="uk-width-expand">
 
-        <div class="search-result">
-            <div uk-spinner="ratio: 4.5 " *ngIf="isSearchLoaded == false; else loadFin">
-                Loading...
-            </div>
-            <ng-template #loadFin>
-                <div *ngFor="let articleSource of articleSources; index as i">
-                    <div class="row">
-                        <div class="col-xs" style="margin: auto; padding: 1em;">
-                            <div class="form-group">
-                                <input type="checkbox" (click)="this.addList(i)" />
-                            </div>
-                        </div>
-
-                        <div class="col">
-                            <div class="row">
-                                <div class="container">
-                                    <app-article-details [article]="articleSource">
-                                    </app-article-details>
+            <div class="search-result">
+                <div uk-spinner="ratio: 4.5 " *ngIf="isSearchLoaded == false; else loadFin">
+                    Loading...
+                </div>
+                <ng-template #loadFin>
+                    <div *ngFor="let articleSource of articleSources; index as i">
+                        <div class="row">
+                            <div class="col-xs" style="margin: auto; padding: 1em;">
+                                <div class="form-group">
+                                    <input type="checkbox" (click)="this.addList(i)" />
                                 </div>
                             </div>
-                            <div #relatedKeyWords class="row">
-                                <div uk-spinner="ratio: 2.5 " *ngIf="isKeyLoaded == false; else infoLoadFin">
-                                    Loading...
+
+                            <div class="col">
+                                <div class="row">
+                                    <div class="container">
+                                        <app-article-details [article]="articleSource">
+                                        </app-article-details>
+                                    </div>
                                 </div>
-                                <ng-template #infoLoadFin>
-                                    <div class="col">키워드 : {{ keywords[i] }}</div>
-                                    <!-- <div class="col">
+                                <div #relatedKeyWords class="row">
+                                    <div uk-spinner="ratio: 2.5 " *ngIf="isKeyLoaded == false; else infoLoadFin">
+                                        Loading...
+                                    </div>
+                                    <ng-template #infoLoadFin>
+                                        <div class="col">키워드 : {{ keywords[i] }}</div>
+                                        <!-- <div class="col">
                     <div class="row">연관문서</div>
                     <div class="row">{{ rcmdList[i]["rcmd"] }}</div>
                   </div> -->
-                                </ng-template>
+                                    </ng-template>
+                                </div>
+                                <hr>
                             </div>
-                            <hr>
-                        </div>
-                        <div #relatedDocuments>
-                            <div uk-spinner="ratio: 2.5 " *ngIf="isKeyLoaded == false">
-                                Loading...
-                            </div>
-                            <div *ngIf="isRelatedLoaded == true">
-                                <div class="col-xs" style="margin: auto; padding: 1em;">
-                                    <button class="uk-button uk-button-secondary" (click)="tgglRelated(i)">
-                    연관문서
-                  </button>
-                                    <div *ngIf="relateToggle[i] == true">
-                                        <div *ngFor="let rcmd of rcmdList[i]['rcmd']; index as r">
-                                            <!-- {{ rcmdList[i]["rcmd"] }} -->
-                                            <a (click)="setThisDoc(i, r)">{{ rcmd }}</a>
+                            <div #relatedDocuments>
+                                <div uk-spinner="ratio: 2.5 " *ngIf="isKeyLoaded == false">
+                                    Loading...
+                                </div>
+                                <div *ngIf="isRelatedLoaded == true">
+                                    <div class="col-xs" style="margin: auto; padding: 1em;">
+                                        <button class="uk-button uk-button-secondary" (click)="tgglRelated(i)">
+                                            연관문서
+                                        </button>
+                                        <div *ngIf="relateToggle[i] == true">
+                                            <div *ngFor="let rcmd of rcmdList[i]['rcmd']; index as r">
+                                                <!-- {{ rcmdList[i]["rcmd"] }} -->
+                                                <a (click)="setThisDoc(i, r)">{{ rcmd }}</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!--검색 결과의 마지막 -->
-                </div>
-                <div *ngIf="articleSources?.length < 1" style="margin-top:20px">
-                    <div class="uk-position-center">
-                        <h3>검색결과가 없습니다</h3>
+                        <!--검색 결과의 마지막 -->
                     </div>
-                </div>
-            </ng-template>
+                    <div *ngIf="articleSources?.length < 1" style="margin-top:20px">
+                        <div class="uk-position-center">
+                            <h3>검색결과가 없습니다</h3>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
         </div>
-        나의 최근 검색 키워드
-        <!-- {{ console.log(" histroy test")}} -->
-        <!-- {{ console.log( this.auth.schHst )}} -->
+        <div class="uk-width-small">
+            <!-- {{ console.log(" histroy test")}} -->
+            <!-- {{ console.log( this.auth.schHst )}} -->
 
-        <div class="uk-card uk-card-body uk-card-default">
+            검색 기록
+            <div class="uk-card uk-card-body uk-card-default">
 
-            <div *ngFor="let hst of auth.schHst; index as i">
-                <div class="row">
-                    <a (click)="relatedSearch(hst.keyword)">{{ hst.keyword }}</a>
+                <div *ngFor="let hst of auth.schHst; index as i">
+                    <div class="row">
+                        <a (click)="relatedSearch(hst.keyword)">{{ hst.keyword }}</a>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
+    </div>

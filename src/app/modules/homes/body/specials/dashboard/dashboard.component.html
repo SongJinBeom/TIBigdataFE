@@ -1,106 +1,114 @@
 <p>UserDashBoard Page</p>
 
-
 <div class="entire-Board" style= "width : 100%; display: table; border: 1px black solid;">
 
   <div class="docList" style= "width : 100%; display: table-cell; border: 1px red solid;">
-      <ul>
-        <div *ngFor = "let doc of this.docTitleList; index as d">
-          <li>
-           <a>{{ docTitleList[d]}} </a>
-          </li>
-     </div>
-      </ul>
+      <h2>도움말</h2>
 
+        사용자의 선택에 따라 분석을 결과가 제공됩니다.
+        <ul>
+          <li>
+            1. 단일문서 선택 - TF/IDF 분석 또는 카테고리 분석 - Bar / Dounut / Line Graph
+          </li>
+          <li>
+            2. 다중문서 선택 - 연관문서 산출 - Word Cloud Graph
+          </li>
+        </ul>
   </div>
-  
 </div>
 
+<div class="block" style="width : 100%; display: table; border: 1px black solid;">
 
-
-<div class = "block" style= "width : 100%; display: table; border: 1px black solid;">
-
-  <div class = "keyword-block" style="display:table-cell; border: 1px red solid; width: 20%;">
-        사용자 검색 내역 
-      <ul>
-        <div *ngFor = "let hst of this.search_history; index as i">
-             <li>
-              <a> {{ search_history[i]}} </a>
-             </li>
-        </div>
-      </ul> 
+  <div class="keyword-block" style="display:table-cell; border: 1px red solid; width: 20%;">
+    사용자 검색 내역
+    <ul>
+      <div *ngFor="let doc of myDocsTitles, index as i">
+        <li>
+          <div class="form-group">
+            <input type="checkbox" (click)="this.addList(i)" />
+          </div>
+          <a>{{ doc }}</a>
+        </li>
+      </div>
+    </ul>
   </div>
 
-  <div class = "choose-block" style="display:table-cell; border:1px green solid; width : 30%;">
+  <div class="choose-block" style="display:table-cell; border:1px green solid; width : 30%;">
+
     <div class="analysis-choose" style="border : 1px gold solid;">
       무슨 분석을 하시겠습니까?
-         <div *ngFor="let word of this.analysisList; index as i">
-            <input type="radio" formContronName="sis"  name = "i" [value] = "analysisList[i]" [(ngModel)] = "userAnalysisChoice"> 
-            {{analysisList[i]}}
-          </div>  
+      <div *ngIf="chosenCount > 1 || chosenCount == 0">
+        <div *ngFor="let word of this.analysisList; index as i">
+          <input type="radio" formContronName="sis" name="i" [value]="analysisList[i]" [(ngModel)]="userAnalysisChoice">
+          {{analysisList[i]}}
+        </div>
       </div>
+    </div>
+
+
+    <!--
+    <div class="form-group">
+      <input type="radio" name="related" [value]="related" [(ngModel)]="userAnalysisChoice">related
+    </div>
+
+       <div *ngIf= "userGraphChoice == 'Word' || chosenCount==1" class = "column">
+        <angular-tag-cloud
+                    [data]="cData"
+                    [width]="options.width"
+                    [height]="options.height"
+        >
+        </angular-tag-cloud>
+
+      </div>
+    -->
 
 
 
- 
+
+
 
     <div class="graph-choose" style="border : 1px cyan solid;">
       무슨 그래프를 선택하시겠습니까?
 
       <div *ngFor="let word of this.graphList; index as k">
-        <input type="radio" formContronName="gra"  name = "k" [value] = "graphList[k]" [(ngModel)] = "userGraphChoice"> 
+        <input type="radio" formContronName="gra" name="k" [value]="graphList[k]" [(ngModel)]="userGraphChoice">
         {{graphList[k]}}
       </div>
 
     </div>
     <button (click)="showResult()">Choice Complete</button>
-    <div *ngIf="choiceComplete">Your Choice :  <b>{{userAnalysisChoice}} Analysis</b> and <b>{{userGraphChoice}} Graph</b></div>
+    <div *ngIf="choiceComplete">Your Choice : <b>{{userAnalysisChoice}} Analysis</b> and <b>{{userGraphChoice}}
+        Graph</b></div>
   </div>
 
-  <div class = "graph-block" style="display:table-cell; border:1px blue solid;">
+  <div class="graph-block" style="display:table-cell; border:1px blue solid;">
     그래프
-      <div *ngIf="choiceComplete">
+    <div *ngIf="choiceComplete">
 
-            <div *ngIf="userGraphChoice == 'Bar'" class = "column" style="display: block; width : 90%; height : 500px; margin: 20px;">
-              <canvas baseChart
-                      [datasets]="barChartData"
-                      [labels]="barChartLabels"
-                      [options]="barChartOptions"
-                      [legend]="barChartLegend"
-                      [chartType]="barChartType"
-                      [options]="barChartOptions">
-              </canvas>
-            </div>
+   
 
-            <div *ngIf="userGraphChoice == 'Dounut'" class = "column" style="display: block; width : 90%; height : 500px">
-                <canvas baseChart 
-                [data]="doughnutChartData"
-                [labels]="doughnutChartLabels"
-                [chartType]="doughnutChartType"
-                [colors]="doughnutChartColors"
-                >
-              </canvas>
-            </div>
 
-            <div *ngIf="userGraphChoice == 'Line'" class = "column" style="display: block; width : 90%; height : 500px">
-                <canvas baseChart 
-                    [datasets]="lineChartData" 
-                    [labels]="lineChartLabels" 
-                    [options]="lineChartOptions"
-                    [colors]="lineChartColors" 
-                    [legend]="lineChartLegend" 
-                    [chartType]="lineChartType" 
-                    [plugins]="lineChartPlugins">
-                </canvas>
-            </div>
+      <div *ngIf="userGraphChoice == 'Bar'" class="column"
+        style="display: block; width : 90%; height : 500px; margin: 20px;">
+        <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
+          [legend]="barChartLegend" [chartType]="barChartType" [options]="barChartOptions">
+        </canvas>
+      </div>
 
-        
-        </div>
+      <div *ngIf="userGraphChoice == 'Dounut'" class="column" style="display: block; width : 90%; height : 500px">
+        <canvas baseChart [data]="doughnutChartData" [labels]="doughnutChartLabels" [chartType]="doughnutChartType"
+          [colors]="doughnutChartColors">
+        </canvas>
+      </div>
+
+      <div *ngIf="userGraphChoice == 'Line'" class="column" style="display: block; width : 90%; height : 500px">
+        <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="lineChartOptions"
+          [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType"
+          [plugins]="lineChartPlugins">
+        </canvas>
+      </div>
+
+    </div>
   </div>
 
 </div>
-
-
-
-
-

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const gUser = require('./models/gUser');
+const User = require('./models/user');
 
 //google token verify code template
 const { OAuth2Client } = require('google-auth-library');
-
 
 /**
  * @GoogleLoginFunctions
@@ -44,11 +43,11 @@ function verifyGoogleToken(req, res) {
     })
 }
 
-
 router.post('/gRegister', (req, res) => {
     console.log("api : gRegister init.");
     let userData = req.body;
-    let user = new gUser(userData);
+    userData.auth = "google";
+    let user = new User(userData);
     user.save((error, registeredUser) => {
         if (error) {
             console.log("google social user register data save error : " + error);
@@ -64,26 +63,20 @@ router.post('/gRegister', (req, res) => {
 router.post('/gCheckUser', (req, res) => {
     console.log("api : gChecker init.");
     let userData = req.body;
-    gUser.findOne({ email: userData.email }, (error, user) => {
+    User.findOne({ email: userData.email }, (error, user) => {
         if (error) {
             console.log("gCheckUSer error : " + error);
         }
         else {
             if (!user) {
-                // console.log("api gchecker : post false")
-                // console.log(user);
                 res.json({ exist: false });
             }
             else {
-                // console.log("api gchecker : post true")
-                // console.log(user);
-
                 res.json({ exist: true });
             }
         }
     })
 })
-
 
 router.post('/verifyGoogleToken', verifyGoogleToken);
 module.exports = router;

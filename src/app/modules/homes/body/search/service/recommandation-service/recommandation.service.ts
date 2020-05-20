@@ -15,7 +15,7 @@ export class RecomandationService {
   private _router : Router,
   private idControl : IdControlService) {}
   // private idList: string[] = [];
-  private RCMD_URL: string = this.ipService.getCommonIp() + ":5000/rcmd";
+  private RCMD_URL: string = this.ipService.getUserServerIp() + ":5000/rcmd";
   private isInfoLoaded: boolean = false;
   rcmdList: {};
   private headers: HttpHeaders = new HttpHeaders({

@@ -8,8 +8,8 @@ import { IpService } from 'src/app/ip.service'
 })
 export class EventService {
 
-  private _eventsUrl = this.ipService.getCommonIp() + ":4000/api/events";
-  private _srchHstUrl = this.ipService.getCommonIp() + ":4000/api/searchHistory";
+  private _eventsUrl = this.ipService.getUserServerIp() + ":4000/api/events";
+  private _srchHstUrl = this.ipService.getUserServerIp() + ":4000/api/searchHistory";
   private srchHst : string[] = [];
 
 

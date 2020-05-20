@@ -70,12 +70,12 @@ async function verifyToken(req, res) {
             console.log("payload : ", payload);
         }
         catch (err) {
-            if(err.message==="jwt expired"){
+            // console.log(err);
+            if(err.message == "jwt expired"){
                 return res.status(200).send(new Res(false,"expired"));
             }
-
             else{
-                console.log("jwt verify error!", err);
+                console.log("jwt verify error!");
                 return res.status(401).send(new Res(false,"token unverified!"));
             }
         }
@@ -151,6 +151,7 @@ router.post('/register', (req, res) => {
         bcrypt.hash(userData.password, salt,(err,hash)=>{
             userData.password = hash;
             // console.log(userData);
+            userData.auth = "email";
             let user = new User(userData);
             user.save((error, userData) => {//save new user data account
                 if (error) {
@@ -173,7 +174,7 @@ router.post('/register', (req, res) => {
 // http://localhost:4000/api/login
 router.post('/login', (req, res) => {
     let userData = req.body;
-    console.log(userData);
+    console.log("recieved user data : ",userData);
     // if (!eCheckUser(userData.email)) {//when this user is not on our user list, deny login, and lead to register
     //     console.log("hello?");
     //     res.json({ success: false, message: "this user is not our user" });
@@ -182,7 +183,7 @@ router.post('/login', (req, res) => {
     console.log("login process init")
     User.findOne({ email: userData.email }, (error, user) => {
         if (error) {
-            console.log(error)
+            console.err(error)
         }
         else {
             if (!user) {//no user -> serious error since we have already check this user is one of us in FE.
@@ -190,7 +191,11 @@ router.post('/login', (req, res) => {
             }
             else {
                 bcrypt.compare(userData.password, user.password, function(err, result) {
-                    if(result == false){//hash value incorrect
+                    console.log("recieved userdata pw : ",userData.password);
+                    console.log("user db pw : ",user.password);
+                    console.log("pw match result : ", result);
+                    if(!result){//hash value incorrect
+                        console.log("password failed");
                         res.json(new Res (false,'pw'));
                     }
                     else{

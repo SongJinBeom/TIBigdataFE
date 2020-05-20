@@ -19,6 +19,10 @@ export class IdControlService {
     this.idList.push(id);
   }
 
+  popIdList(){
+    this.idList.pop();
+  }
+
   clearIdList(){
     this.idList = [];
   }

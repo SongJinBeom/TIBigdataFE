@@ -39,11 +39,14 @@ import { Injectable } from '@angular/core';
 })
 export class IpService {
 
-  private SERVER_IP = "http://203.252.103.123";
+  private USER_SERVER_IP = "http://203.252.112.15";
   private DEV_IP = "http://localhost";
   private curIP = "";
 
-  private BE_SERVER_IP = "http://203.252.103.86";
+  private BackEnd_SERVER_IP = "http://203.252.112.14";
+  private NM_IP = "http://203.252.103.86"
+  private SERVER_IP = "http://203.252.103.123";
+
 
   USER_BE_PORT = "4000";
   FLASK_PORT = "5000";
@@ -51,6 +54,37 @@ export class IpService {
 
   constructor() { }
 
+  getCurrIp(){
+    let ipArr = window.location.origin.split(/:[0-9]+/);
+    return ipArr[0];
+  }
+
+  adaptIp(whichServerIp:string){
+    let currIp = this.getCurrIp()
+    if (currIp != this.USER_SERVER_IP){
+      return this.NM_IP;
+      //return this.DEV_IP;
+    }
+    else{
+      return whichServerIp;
+    }
+
+  }
+
+  getUserServerIp(){
+    return this.adaptIp(this.USER_SERVER_IP);
+  }
+
+  getBackEndServerIp(){
+    return this.adaptIp(this.BackEnd_SERVER_IP) + ":"+this.ES_PORT + "/nkdb";
+  }
+
+  getDevIp(){
+    return this.DEV_IP;
+  }
+
+
+ 
   getCommonIp(){
     let ipArr = window.location.origin.split(/:[0-9]+/);
     let ip = ipArr[0]
@@ -64,10 +98,6 @@ export class IpService {
 
     return this.curIP;
     
-  }
-
-  getDevIp(){
-    return this.DEV_IP;
   }
 }
 

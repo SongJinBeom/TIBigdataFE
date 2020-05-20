@@ -14,7 +14,7 @@ import { Observable, of} from 'rxjs';
   styleUrls: ['./flask.component.less']
 })
 export class FlaskComponent implements OnInit {
-  private URL = this.ipService.getCommonIp();
+  private URL = this.ipService.getUserServerIp();
   private BASE_URL: string = this.URL+':5000/wordrank';
   private TEST_URL: string = this.URL+':5000/test';
 

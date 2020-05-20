@@ -4,6 +4,8 @@ import * as elasticsearch from "elasticsearch-browser";
 //import { InheritDefinitionFeature } from '@angular/core/src/render3';
 import { ArticleSource } from "../../article/article.interface";
 import { Subject, Observable } from "rxjs";
+import { IpService } from 'src/app/ip.service'
+
 
 @Injectable({
   providedIn: "root"
@@ -15,7 +17,7 @@ export class ElasticsearchService {
   articleInfo$ = this.articleSource.asObservable();
   private searchKeyword: string = undefined;
 
-  constructor() {
+  constructor(private ipSvc : IpService) {
     if (!this.client) {
       this._connect();
     }
@@ -131,9 +133,29 @@ export class ElasticsearchService {
     });
   }
 
+  searchByManyId(ids: string[]) {
+    return this.client.search({
+      filterPath: ["hits.hits"],
+      body: {
+        query: {
+          terms: {
+            _id: ids
+          }
+        }
+      },
+      _source: [
+        "post_title",
+        "post_date",
+        "published_institution_url",
+        "post_writer",
+        "post_body"
+      ]
+    });
+  }
+
   //Elasticsearch Connection
   private _connect() {
-    let es_url = "http://203.252.103.86:9200";
+    let es_url = this.ipSvc.getBackEndServerIp();
     this.client = new elasticsearch.Client({
       host: es_url
       // log: "trace"//to log the query and response in stdout
