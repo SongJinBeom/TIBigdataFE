@@ -1,20 +1,17 @@
-<p>UserDashBoard Page</p>
-
-
 <div class="entire-Board" style= "width : 100%; display: table; border: 1px black solid;">
 
   <div class="uk-card uk-card-default uk-card-body" style= "width : 100%; display: table-cell;">
-    <dl class="uk-description-list">
+    <dl class="uk-description-list" style="margin: 10px;">
       <h3>도움말</h3>
 
       <dt>1단계</dt>
-      <dd>문서 선택 한다</dd>
+      <dd>내가 고른 문서들 중에서 분석할 문서들을 선택 한다</dd>
       
       <dt>2단계</dt>
-      <dd>분석 선택 한다</dd>
+      <dd>원하는 분석과 그래프 그리고 출력할 데이터의 수를 선택 한다</dd>
       
       <dt>3단계</dt>
-      <dd>그래프 선택 한다</dd>
+      <dd>결과를 출력한다</dd>
   </dl>
   </div>
     <!--
@@ -37,10 +34,10 @@
 
 
 
-<div class="block" style="width : 100%; display: table; border: 1px black solid;">
+<div class="block" style="width : 100%; display: table; border: 1px white solid;">
 
-  <div class="keyword-block" style="display:table-cell; border: 1px red solid; width: 30%;">
-    문서 보유 목록
+  <div class="keyword-block" style="display:table-cell; border: 1px black solid; width: 25%;">
+    문서 목록
     <ul>
       <div *ngFor="let doc of this.docTitleList, index as t">
           <div class="form-group">
@@ -53,25 +50,26 @@
     </ul>
   </div>
 
-  <div class="choose-block" style="display:table-cell; border:1px green solid; width : 20%;">
-    <div class="analysis-choose" style="border : 1px gold solid;">
-      무슨 분석을 하시겠습니까?
+  <div class="choose-block" style="display:table-cell; border:1px black solid; width : 18%;">
+    <div class="analysis-choose" style="border : 1px black solid; font-size: 15pt;">
+      무슨 알고리즘을 선택하시겠습니까?
       <div *ngIf="chosenCount > 1 || chosenCount == 0">
         <div *ngFor="let word of this.analysisList; index as i">
           <input class="uk-radio" type="radio" formContronName="sis" name="i" [value]="analysisList[i]" [(ngModel)]="userAnalysisChoice">
                {{analysisList[i]}}
         </div>
       </div>
+      <div  *ngIf = "chosenCount ==1" class="form-group">
+        <input  class="uk-radio" type="radio" name="related" [value]="related" [(ngModel)]="userAnalysisChoice" checked>Related Docs
+      </div>
     </div>
-    <div class="form-group">
-      <input  class="uk-radio" type="radio" name="related" [value]="related" [(ngModel)]="userAnalysisChoice">related
-    </div>
+   
 
 
 
 
 
-    <div class="graph-choose" style="border : 1px cyan solid;">
+    <div class="graph-choose" style="border : 1px black solid;  font-size: 15pt;">
       무슨 그래프를 선택하시겠습니까?
 
       <div *ngFor="let word of this.graphList; index as k">
@@ -96,10 +94,7 @@
       
     </div>
 
-  <div class="graph-block" style="display:table-cell; border:1px blue solid;">
-    그래프
-  
-    
+  <div class="graph-block" style="display:table-cell; border: 1px white solid;">    
     
     <div *ngIf="choiceComplete">
       <b>{{userAnalysisChoice}} Analysis</b> and <b>{{userGraphChoice}} Graph </b> and  <b> {{userNumChoice}} Data </b>

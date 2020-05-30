@@ -8,10 +8,9 @@ import { EPAuthService } from '../../../../core/componets/membership/auth.servic
 import { ElasticsearchService } from "../../search/service/elasticsearch-service/elasticsearch.service";
 import { IdControlService } from "../../search/service/id-control-service/id-control.service";
 import { RecomandationService } from "../../search/service/recommandation-service/recommandation.service";
-
+import { _ } from 'node_modules/underscore/underscore.js';
 
 import { CloudData, CloudOptions } from "angular-tag-cloud-module";
-
 import { thresholdSturges } from 'd3-array';
 import { map } from "rxjs/operators";
 import { ReturnStatement, viewClassName } from '@angular/compiler';
@@ -20,6 +19,7 @@ import { inject } from '@angular/core/testing';
 import { FormControl, FormGroup } from "@angular/forms";
 import { CloseScrollStrategy } from '@angular/cdk/overlay';
 import { keyframes } from '@angular/animations';
+import { NumberSymbol } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,8 +29,6 @@ import { keyframes } from '@angular/animations';
 
 export class DashboardComponent implements OnInit {
   
- @ViewChild(BaseChartDirective , {static : false}) charts: QueryList<BaseChartDirective>;;
-
   constructor(
     private auth: EPAuthService,
     private http: HttpClient,
@@ -40,8 +38,8 @@ export class DashboardComponent implements OnInit {
     private rcmd : RecomandationService
   ) { }
 
-  analysisList: string[] = ["TFIDF", "LDA", "Related Doc", "RNN"];
-  graphList: string[] = ["Dounut", "Word-Cloud", "Bar", "Line"];
+  analysisList: string[] = ["TFIDF(키워드)", "LDA(주제-통계)", "RNN(주제-딥러닝)"];
+  graphList: string[] = ["도넛", "워드클라우드", "막대", "선"];
   idList1 : string[] = [
     "5de110274b79a29a5f987f1d",
     "5de1107f4b79a29a5f988202",
@@ -50,13 +48,9 @@ export class DashboardComponent implements OnInit {
     "5de113f4b53863d63aa55369"
   ]
 
-
-
   docTitleList = [];
 
   private tfidfDir : string = "../../../../../../assets/entire_tfidf/data.json";
-
-  
   private hstReqUrl = this.ipService.getUserServerIp() + ":4000/hst/getTotalHistory";
   private hstFreq: any[];
 
@@ -79,41 +73,46 @@ export class DashboardComponent implements OnInit {
   private userAnalysisChoice: string;
   private userGraphChoice: string;
   private userNumChoice = 0;
+  private TfTable = [];
+  
 
-  ngOnInit() {
-    if (!this.auth.getLogInStat())
+
+  ngOnInit() { 
+    if (!this.auth.getLogInStat()){
       console.log("wow");
       //alert("로그인이 필요한 서비스 입니다. 로그인 해주세요.");
+    }
     else {
       this.chosenCount = 0;
       this.idSvs.clearAll();
       console.log("dash board - page");
-      this.convertID2Title().then(() => {
-        //console.log(this.myDocsTitles)
-        this.queryHistory().then(() => {
-          this.search_history.forEach(word => {
-            this.graphData.push(word);
-          });
 
-          this.graphData.sort((a, b) => {
-            return b.count - a.count;
-          }); //count를 기준으로 정렬
-
-          this.findTextData(this.graphXData);
-          this.findCountData(this.graphYData);
-          this.findTextData(this.search_history);
-          this.findDocName();
-          //console.log(this.search_history);
-        });
+      this.convertID2Title().then(()=>{
+       this.findDocName(); 
       })
+      // this.convertID2Title().then(() => {
+
+      //   this.queryHistory().then(() => {
+      //     this.search_history.forEach(word => {
+      //       this.graphData.push(word);
+      //     });
+
+      //     this.graphData.sort((a, b) => {
+      //       return b.count - a.count;
+      //     }); //count를 기준으로 정렬
+
+      //     this.findDocName();
+      //   });
+      // })
     }
+    
   }
 
   async convertID2Title() {
     this.idList = await this.auth.getMyDocs() as string[];
     return new Promise((resolve) => {
       this.es.searchByManyId(this.idList).then(res=>{
-        console.log(res);
+        //console.log(res);
         let articles = res["hits"]["hits"];
         for(let i = 0 ; i < articles.length; i++){
           this.myDocsTitles[i]=articles[i]["_source"]["post_title"][0]
@@ -139,10 +138,10 @@ export class DashboardComponent implements OnInit {
   boxChange(i){
    if(this.filter[i]){
     this.addList(i);
-    console.log(i+"넣음");
+    console.log(i+"문서 넣음");
    }else{
     this.removeList(i);
-    console.log(i+"빠짐");
+    console.log(i+"문서 빠짐");
    }
   }
 
@@ -175,12 +174,12 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  private TfTable = [];
   
 
   makeTf(){
-    var docNum = this.idList.length;
+    this.clearGraph();
 
+    var docNum = this.idList.length;
     this.http.get(this.tfidfDir).subscribe(docData1 => {
       var temp;
       var sampleID;
@@ -200,7 +199,6 @@ export class DashboardComponent implements OnInit {
             //console.log(this.docTitleList[j]);
             
             let tfVal = docData[i]["TFIDF"];
-
             
             let tWord, tVal;
             var tJson = new Object();
@@ -223,17 +221,23 @@ export class DashboardComponent implements OnInit {
         return b["value"] - a["value"];
       });
 
-    this.findTextData(tempArr);
-    this.findCountData(tempArr);
-   })
+      var uniqArr = _.uniq(tempArr, "word");
+      console.log(uniqArr);
+      this.findTextData(uniqArr);
+      this.findCountData(uniqArr);
 
+   })
   }
+
+
+  
 
   findDocName(){
     //var docNum = this.idList.length;
     var docNum = this.chosenCount;
 
-   // console.log(this.idList);
+    console.log("선택 문서 수 : " + docNum);
+    console.log("다시 문서 수 : " + this.idList.length);
 
     this.http.get(this.tfidfDir).subscribe(docData1 => {
        var temp;
@@ -252,9 +256,9 @@ export class DashboardComponent implements OnInit {
            }
          }
        }
-       
-       //console.log("야호"+this.docTitleList);
     })
+
+    console.log("골라진 문서 수 : "+this.docTitleList.length);
  }
 
 
@@ -286,9 +290,19 @@ export class DashboardComponent implements OnInit {
   }
 
   getUserChoice() {
+
     this.userDataChoice = this.search_history;
     //this.userAnalysisChoice = "";
     //this.userGraphChoice  = document.getElementById("g1");
+    this.barChartData = this.graphYData;
+    this.barChartLabels = this.graphXData;
+
+    this.lineChartData = this.graphYData;
+    this.lineChartLabels =this.graphXData;
+    
+    this.doughnutChartData = this.graphYData;
+    this.doughnutChartLabels = this.graphXData;
+    
   }
 
 
@@ -297,6 +311,7 @@ export class DashboardComponent implements OnInit {
   }
 
   clearResult(){
+    //this.clearGraph();
     this.barChartData = [];
     this.barChartLabels = [];
 
@@ -308,10 +323,14 @@ export class DashboardComponent implements OnInit {
     
     this.userAnalysisChoice = "";
     this.userGraphChoice = '';
-    this.userNumChoice = 0;
+    //this.userNumChoice = 0;
     console.log("CLEAR");
   }
 
+  clearGraph(){
+    this.graphYData = [];
+    this.graphXData = [];
+  }
 
   showResult() {
     console.clear();
@@ -344,6 +363,7 @@ export class DashboardComponent implements OnInit {
     console.log(this.userNumChoice);
   }
 
+////
 
   barChartOptions: ChartOptions = {
     responsive: true,
@@ -362,17 +382,15 @@ export class DashboardComponent implements OnInit {
   barChartType: ChartType = 'bar';
   barChartLegend = true;
   barChartPlugins = [];
-
-
+  
   barChartColors: Color[] = [
     { backgroundColor: 'rgba(000,153,255,0.5)' },
   ]
 
-
   barChartData: ChartDataSets[] = [
     { data: this.graphYData, label: this.userAnalysisChoice + " Analysis" }
   ];
-  /////////////
+  ////
 
 
 
